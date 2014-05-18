@@ -13,7 +13,9 @@ char* preprocess(char* input) {
     char *to_repeat_s;
     int repeat_start = 0;
 
-    char* processed = calloc(2000, sizeof(char));
+    int processed_length = strlen(input);
+
+    char* processed = calloc(processed_length, sizeof(char));
     int processed_index = 0;
 
     for(int input_pointer = 0; input[input_pointer] != '\0'; ++input_pointer) {
@@ -46,6 +48,8 @@ char* preprocess(char* input) {
             // If not, figure out what to repeat and use sprintf to do
             // the repetition in a /really nice way/.
             if (to_repeat != '}') {
+                processed_length += num-1;
+                processed = realloc(processed, processed_length);
                 for(; num != 0; --num) {
                     processed[processed_index++] = to_repeat;
                 }
@@ -53,6 +57,8 @@ char* preprocess(char* input) {
                 repeat_start = index_in(input, '{')+1;
                 input[repeat_start-1] = '\x02';
                 to_repeat_s = get_part(input, repeat_start, input_pointer-strlen(nums));
+                processed_length += strlen(to_repeat_s)*(num-1);
+                processed = realloc(processed, processed_length);
                 for (; num != 0; --num) {
                     processed_index += sprintf(processed+processed_index, "%s", to_repeat_s);
                 }
@@ -66,8 +72,6 @@ char* preprocess(char* input) {
         num = 0;
         num_index = 0;
     }
-    // Now reallocate to remove extra memory usage.
-    processed = realloc(processed, processed_index+1);
     free(nums);
     return processed;
 }
