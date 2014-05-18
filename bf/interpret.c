@@ -5,6 +5,7 @@
 #include <math.h>
 #include <string.h>
 #include "stack.h"
+#include "util.h"
 
 #ifdef FMATH
 #include <pmmintrin.h>
@@ -74,6 +75,29 @@ struct return_struct *run_tape(char* tape) {
 			*cell_p = round(sqrt(*cell_p));
 			#endif
 			break;
+        case '?':
+            if (*cell_p != 0) {
+                input_pointer = index_in(tape, '!');
+            } else {
+                tape[index_in(tape, '!')] = '\x03';
+            }
+            break;
+        case '\x03':
+            input_pointer = index_in(tape, '*');
+            tape[input_pointer] = '\x04';
+            break;
+        case '~':
+            if (*cell_p < 0) {
+                *(cell_p+1) = 1;
+            } else {
+                *(cell_p+1) = 0;
+            } break;
+        case '&':
+            if (*cell_p > 0) {
+                *(cell_p+1) = 1;
+            } else {
+                *(cell_p+1) = 0;
+            } break;
 		}
 	}
 	stack_free(loop_stack);
