@@ -12,8 +12,8 @@
 #include "interpret.h"
 #include "preprocess.h"
 
-char *processed;
-struct return_struct *s;
+char *processed_main;
+struct return_struct *rs;
 
 int main(int argc, char* argv[]) {
 	if (argc == 1) {
@@ -26,13 +26,13 @@ int main(int argc, char* argv[]) {
         printf("%s\n", preprocess(argv[2]));
         return 0;
     }
-	processed = preprocess(argv[1]); 
-	s = NULL;
-	s = run_tape(processed);
-	printf("%s\n", s->output);
-	free(s->output);
-	printf("\nRan in %d iterations.\n", s->iterations);
-	free(s);
-	free(processed);
+	processed_main = preprocess(argv[1]); 
+	rs = NULL;
+	rs = run_tape(processed_main);
+	printf("%s\n", rs->output);
+	free(rs->output);
+	printf("\nRan in %d iterations.\n", rs->iterations);
+	free(rs);
+	free(processed_main);
 	return 0;
 }

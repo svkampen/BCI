@@ -2,9 +2,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int round(double x) {
-    return (int(x > 0 ? x + 0.5 : x - 0.5));
-
 int index_in(char* string, char part) {
     char *tmp = strchr(string, part);
     int tmp_i=0;

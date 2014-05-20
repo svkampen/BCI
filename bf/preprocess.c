@@ -5,23 +5,33 @@
 #include <stdio.h>
 #include <ctype.h>
 
+char *nums;
+int num_index;
+int num;
+char to_repeat_c;
+char *to_repeat_s;
+int repeat_start;
+int processed_length;
+char *processed;
+int processed_index;
+int input_pointer;
+
 char* preprocess(char* input) {
-    char* nums = calloc(10, sizeof(char));
-    int num_index = 0;
-    int num = 0;
-    char to_repeat = 0;
-    char *to_repeat_s;
-    int repeat_start = 0;
+    nums = calloc(10, sizeof(char));
+    num_index = 0;
+    num = 0;
+    to_repeat_c = 0;
+    repeat_start = 0;
 
-    int processed_length = strlen(input);
+    processed_length = strlen(input);
 
-    char* processed = calloc(processed_length, sizeof(char));
-    int processed_index = 0;
+    processed = calloc(processed_length, sizeof(char));
+    processed_index = 0;
 
-    for(int input_pointer = 0; input[input_pointer] != '\0'; ++input_pointer) {
+    for(; input[input_pointer] != '\0'; ++input_pointer) {
         if (isdigit(input[input_pointer])) {
             // This is a number. Get the thing we have to repeat.
-            to_repeat = input[input_pointer-1];
+            to_repeat_c = input[input_pointer-1];
             // Set the num_indexth character of the nums string
             // to the number at this point of the input string.
             // 
@@ -47,11 +57,11 @@ char* preprocess(char* input) {
             //
             // If not, figure out what to repeat and use sprintf to do
             // the repetition in a /really nice way/.
-            if (to_repeat != '}') {
+            if (to_repeat_c != '}') {
                 processed_length += num-1;
                 processed = reallocate(processed, processed_length);
                 for(; num != 0; --num) {
-                    processed[processed_index++] = to_repeat;
+                    processed[processed_index++] = to_repeat_c;
                 }
             } else {
                 repeat_start = index_in(input, '{')+1;

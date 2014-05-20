@@ -24,7 +24,7 @@ char to_repeat;
 struct stack_t *loop_stack;
 struct stack_t *var_stack;
 
-int input_pointer;
+int tape_pointer;
 struct return_struct *s;
 
 unsigned int size;
@@ -39,13 +39,13 @@ struct return_struct *run_tape(char* tape) {
 
 	loop_stack = stack_create();
 	var_stack = stack_create();
-	input_pointer = 0;
+	tape_pointer = 0;
 
 	s = malloc(sizeof(struct return_struct));
-	for (; tape[input_pointer] != '\0'; ++input_pointer) {
+	for (; tape[tape_pointer] != '\0'; ++tape_pointer) {
 		++iterations;
-		//fprintf(stderr, "Handling %c\n", tape[input_pointer]);
-		switch(tape[input_pointer]) {
+		//fprintf(stderr, "Handling %c\n", tape[tape_pointer]);
+		switch(tape[tape_pointer]) {
 		case '+':
 			(*cell_p) += 1; break;
 		case '-':
@@ -59,10 +59,10 @@ struct return_struct *run_tape(char* tape) {
 		case ',':
 			*cell_p = getchar(); break;
 		case '[':
-			stack_push(loop_stack, input_pointer); break;
+			stack_push(loop_stack, tape_pointer); break;
 		case ']':
 			if (*cell_p != 0) {
-				input_pointer = stack_peek(loop_stack);
+				tape_pointer = stack_peek(loop_stack);
 			} else {
 				stack_pop(loop_stack);
 			}
@@ -77,17 +77,17 @@ struct return_struct *run_tape(char* tape) {
 		case ':':
 			output_p += sprintf(output_p, "%d", *cell_p); break;
 		case '\'':
-			*cell_p = tape[input_pointer+1]; break;
+			*cell_p = tape[tape_pointer+1]; break;
         case '?':
             if (*cell_p != 0) {
-                input_pointer = index_in(tape, '!');
+                tape_pointer = index_in(tape, '!');
             } else {
                 tape[index_in(tape, '!')] = '\x03';
             }
             break;
         case '\x03':
-            input_pointer = index_in(tape, '*');
-            tape[input_pointer] = '\x04';
+            tape_pointer = index_in(tape, '*');
+            tape[tape_pointer] = '\x04';
             break;
         case '~':
             if (*cell_p < 0) {
