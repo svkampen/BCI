@@ -1,5 +1,5 @@
-CC=clang
-CFLAGS=-march=native -g -ggdb -Ilist -std=gnu99
+CC=cl65
+CFLAGS=-Ilist -Ibf
 LDFLAGS=-lm
 FILES=bf/*.c list/list.c list/stack.c
 

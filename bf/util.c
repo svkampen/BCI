@@ -1,6 +1,9 @@
 #include "util.h"
 #include <stdlib.h>
-#include <string.h>
+#include <stdio.h>
+
+int round(double x) {
+    return (int(x > 0 ? x + 0.5 : x - 0.5));
 
 int index_in(char* string, char part) {
     char *tmp = strchr(string, part);
@@ -15,3 +18,12 @@ char* get_part(char* string, int x, int y) {
     return tmp;
 }
 
+void *reallocate(void* pointer, size_t new_size) {
+	void *tmp;
+	tmp = realloc(pointer, new_size);
+	if (tmp == NULL) {
+		fprintf(stderr, "Error trying to reallocate %zu bytes of memory.", new_size);
+		exit(-1);
+	}
+	return tmp;
+}

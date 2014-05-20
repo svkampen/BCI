@@ -49,7 +49,7 @@ char* preprocess(char* input) {
             // the repetition in a /really nice way/.
             if (to_repeat != '}') {
                 processed_length += num-1;
-                processed = realloc(processed, processed_length);
+                processed = reallocate(processed, processed_length);
                 for(; num != 0; --num) {
                     processed[processed_index++] = to_repeat;
                 }
@@ -58,9 +58,9 @@ char* preprocess(char* input) {
                 input[repeat_start-1] = '\x02';
                 to_repeat_s = get_part(input, repeat_start, input_pointer-strlen(nums));
                 processed_length += strlen(to_repeat_s)*(num-1);
-                processed = realloc(processed, processed_length);
+                processed = reallocate(processed, processed_length);
                 for (; num != 0; --num) {
-                    processed_index += sprintf(processed+processed_index, "%s", to_repeat_s);
+                    processed_index += sprintf(processed+processed_index, to_repeat_s);
                 }
             }
         } else if (input[input_pointer] == '{' || input[input_pointer] == '}') {

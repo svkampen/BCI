@@ -2,35 +2,47 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>
+#ifdef __GNUC__
 #include <math.h>
+#endif
 #include <string.h>
 #include "stack.h"
 #include "util.h"
 
-#ifdef FMATH
-#include <pmmintrin.h>
-#include <immintrin.h>
+#define REALLOC_SIZE 128
 
-int sse_round(double val) {
-	return(_mm_cvtsd_si32(_mm_set_sd(val)));
-}
-#endif
+int iterations;
+char* output;
+char* output_p;	
+int *cells;
+int *cell_p;
+
+int repetition_num;
+int repetition_pos;
+char to_repeat;
+
+struct stack_t *loop_stack;
+struct stack_t *var_stack;
+
+int input_pointer;
+struct return_struct *s;
+
+unsigned int size;
 
 struct return_struct *run_tape(char* tape) {
-	int iterations = 0;
-	char* output = calloc(2000, sizeof(char));
-	char* output_p = output;
-	int *cells = calloc(256, sizeof(int));
-	int *cell_p = cells;
+	iterations = 0;
+	output = calloc(256, sizeof(char));
+	output_p = output;
 
-	int repetition_num = 0;
-	int repetition_pos = -2;
-	char to_repeat = 0;
+	cells = calloc(256, sizeof(int));
+	cell_p = cells;
 
-	struct stack_t *loop_stack = stack_create();
-	struct stack_t *var_stack = stack_create();
+	loop_stack = stack_create();
+	var_stack = stack_create();
+	input_pointer = 0;
 
-	for (int input_pointer = 0; tape[input_pointer] != '\0'; ++input_pointer) {
+	s = malloc(sizeof(struct return_struct));
+	for (; tape[input_pointer] != '\0'; ++input_pointer) {
 		++iterations;
 		//fprintf(stderr, "Handling %c\n", tape[input_pointer]);
 		switch(tape[input_pointer]) {
@@ -66,15 +78,6 @@ struct return_struct *run_tape(char* tape) {
 			output_p += sprintf(output_p, "%d", *cell_p); break;
 		case '\'':
 			*cell_p = tape[input_pointer+1]; break;
-		case '^':
-			*cell_p = (*cell_p)*(*cell_p); break;
-		case '/':
-			#ifdef FMATH
-			*cell_p = sse_round(sqrt(*cell_p));
-			#else
-			*cell_p = round(sqrt(*cell_p));
-			#endif
-			break;
         case '?':
             if (*cell_p != 0) {
                 input_pointer = index_in(tape, '!');
@@ -102,13 +105,13 @@ struct return_struct *run_tape(char* tape) {
 	}
 	stack_free(loop_stack);
 	stack_free(var_stack);
-	var_stack = loop_stack = NULL;
+	var_stack = NULL;
+	loop_stack = NULL;
 	free(cells);
 	
-	size_t size = strlen(output);
+	size = strlen(output);
 	output_p = NULL;
-	output = realloc(output, size);
-	struct return_struct *s = malloc(sizeof(struct return_struct));
+	output = reallocate(output, size);
 	s->iterations = iterations;
 	s->output = output;
 	return s;
