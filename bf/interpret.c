@@ -2,10 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>
+#include <ctype.h>
 #include <math.h>
 #include <string.h>
 #include "stack.h"
 #include "util.h"
+#include "magic.h"
 
 #ifdef FMATH
 #include <pmmintrin.h>
@@ -32,7 +34,7 @@ struct return_struct *run_tape(char* tape) {
 
 	for (int input_pointer = 0; tape[input_pointer] != '\0'; ++input_pointer) {
 		++iterations;
-		//fprintf(stderr, "Handling %c\n", tape[input_pointer]);
+		// fprintf(stderr, "Handling %c\n", tape[input_pointer]);
 		switch(tape[input_pointer]) {
 		case '+':
 			(*cell_p) += 1; break;
@@ -47,14 +49,14 @@ struct return_struct *run_tape(char* tape) {
 		case ',':
 			*cell_p = getchar(); break;
 		case '[':
+			if (*cell_p == 0) {
+				input_pointer += index_in((tape+input_pointer), ']');
+				break;
+			}
 			stack_push(loop_stack, input_pointer); break;
 		case ']':
-			if (*cell_p != 0) {
-				input_pointer = stack_peek(loop_stack);
-			} else {
-				stack_pop(loop_stack);
-			}
-			break;
+			input_pointer = stack_pop(loop_stack)-1;
+			continue;
 		/* Start non-standard extensions */
 		case '@':
 			stack_push(var_stack, *cell_p); break;
@@ -75,29 +77,33 @@ struct return_struct *run_tape(char* tape) {
 			*cell_p = round(sqrt(*cell_p));
 			#endif
 			break;
-        case '?':
-            if (*cell_p != 0) {
-                input_pointer = index_in(tape, '!');
-            } else {
-                tape[index_in(tape, '!')] = '\x03';
-            }
-            break;
-        case '\x03':
-            input_pointer = index_in(tape, '*');
-            tape[input_pointer] = '\x04';
-            break;
-        case '~':
-            if (*cell_p < 0) {
-                *(cell_p+1) = 1;
-            } else {
-                *(cell_p+1) = 0;
-            } break;
-        case '&':
-            if (*cell_p > 0) {
-                *(cell_p+1) = 1;
-            } else {
-                *(cell_p+1) = 0;
-            } break;
+        case NULLIFY:
+        	*cell_p = 0;
+        	break;
+		}
+		if (isdigit(tape[input_pointer])) {
+			{
+				char *nums = calloc(10, sizeof(char));
+				int num = 0;
+				int num_index = 0;
+				// Okay, fine, the only case wherein this can happen is '+'.
+				nums[num_index++] = tape[input_pointer++];
+    	        // While the input_pointer points to a number,
+        	    // add it to the nums string.
+            	while (isdigit(tape[input_pointer])) {
+	                nums[num_index++] = tape[input_pointer++];
+    	        }
+        	    // We are now at the end of the numbers. Decrease the input pointer,
+            	// because it will be incremented again next in the for loop, and
+	            // if we don't decrement now we will miss a character.
+
+    	        --input_pointer;
+        	    // Get the string of numbers as an int, and subtract one.
+            	// The subtraction is done because one of the repetitions has
+	            // already been done.
+    	        num = atoi(nums)-1;
+        	    *cell_p += num;
+        	}
 		}
 	}
 	stack_free(loop_stack);

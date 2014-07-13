@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
+#include "magic.h"
 
 char* preprocess(char* input) {
     char* nums = calloc(10, sizeof(char));
@@ -37,6 +38,10 @@ char* preprocess(char* input) {
             // if we don't decrement now we will miss a character.
 
             --input_pointer;
+            if (to_repeat == '+') {
+                processed_index += sprintf(processed+processed_index, "%s", nums);
+                continue;
+            }
             // Get the string of numbers as an int, and subtract one.
             // The subtraction is done because one of the repetitions has
             // already been done.
@@ -48,14 +53,16 @@ char* preprocess(char* input) {
             // If not, figure out what to repeat and use sprintf to do
             // the repetition in a /really nice way/.
             if (to_repeat != '}') {
-                processed_length += num-1;
+                processed_length += num;
                 processed = realloc(processed, processed_length);
                 for(; num != 0; --num) {
                     processed[processed_index++] = to_repeat;
                 }
             } else {
                 repeat_start = index_in(input, '{')+1;
-                input[repeat_start-1] = '\x02';
+                // Replace the { with \x02 so that when there is a new bracket repetition,
+                // it does not mistake the { of this brep with the beginning of the other brep.
+                input[repeat_start-1] = PREVIOUSLY_BRACKET_OPEN;
                 to_repeat_s = get_part(input, repeat_start, input_pointer-strlen(nums));
                 processed_length += strlen(to_repeat_s)*(num-1);
                 processed = realloc(processed, processed_length);
@@ -63,6 +70,10 @@ char* preprocess(char* input) {
                     processed_index += sprintf(processed+processed_index, "%s", to_repeat_s);
                 }
             }
+        } else if (strcmp(get_part(input, input_pointer, input_pointer+3), "[-]") == 0) {
+            // optimize this. It's easy!
+            processed[processed_index++] = NULLIFY;
+            input_pointer += 2;
         } else if (input[input_pointer] == '{' || input[input_pointer] == '}') {
             continue; //do not copy these characters.
         } else {
