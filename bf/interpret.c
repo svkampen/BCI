@@ -5,29 +5,14 @@
 #include <ctype.h>
 #include <math.h>
 #include <string.h>
-#include "stack.h"
+#include "../list/stack.h"
 #include "util.h"
 #include "magic.h"
 
-#ifdef FMATH
-#include <pmmintrin.h>
-#include <immintrin.h>
-
-int sse_round(double val) {
-	return(_mm_cvtsd_si32(_mm_set_sd(val)));
-}
-#endif
-
-struct return_struct *run_tape(char* tape) {
-	int iterations = 0;
-	char* output = calloc(2000, sizeof(char));
-	char* output_p = output;
-	int *cells = calloc(256, sizeof(int));
+void run_tape(char* tape) {
+	unsigned long long iterations = 0;
+	int *cells = calloc(1024, sizeof *cells);
 	int *cell_p = cells;
-
-	int repetition_num = 0;
-	int repetition_pos = -2;
-	char to_repeat = 0;
 
 	struct stack_t *loop_stack = stack_create();
 	struct stack_t *var_stack = stack_create();
@@ -45,12 +30,12 @@ struct return_struct *run_tape(char* tape) {
 		case '<':
 			cell_p--; break;
 		case '.':
-			output_p += sprintf(output_p, "%c", *cell_p); break;
+			putchar(*cell_p); fflush(stdout); break;
 		case ',':
 			*cell_p = getchar(); break;
 		case '[':
 			if (*cell_p == 0) {
-				input_pointer += index_in((tape+input_pointer), ']');
+				input_pointer += find_loop_end((tape+input_pointer));
 				break;
 			}
 			stack_push(loop_stack, input_pointer); break;
@@ -65,25 +50,22 @@ struct return_struct *run_tape(char* tape) {
 		case '$':
 			*cell_p = stack_pop(var_stack); break;
 		case ':':
-			output_p += sprintf(output_p, "%d", *cell_p); break;
+			printf("%d", *cell_p); break;
 		case '\'':
 			*cell_p = tape[input_pointer+1]; break;
 		case '^':
 			*cell_p = (*cell_p)*(*cell_p); break;
 		case '/':
-			#ifdef FMATH
-			*cell_p = sse_round(sqrt(*cell_p));
-			#else
+			// *cell_p = sse_round(sqrt(*cell_p));
 			*cell_p = round(sqrt(*cell_p));
-			#endif
 			break;
         case NULLIFY:
-        	*cell_p = 0;
+        	(*cell_p) = 0;
         	break;
 		}
 		if (isdigit(tape[input_pointer])) {
 			{
-				char *nums = calloc(10, sizeof(char));
+				char *nums = calloc(10, 1);
 				int num = 0;
 				int num_index = 0;
 				// Okay, fine, the only case wherein this can happen is '+'.
@@ -103,19 +85,13 @@ struct return_struct *run_tape(char* tape) {
 	            // already been done.
     	        num = atoi(nums)-1;
         	    *cell_p += num;
+        	    free(nums);
         	}
 		}
 	}
 	stack_free(loop_stack);
 	stack_free(var_stack);
 	var_stack = loop_stack = NULL;
+	printf("\n\n\033[1;32mRan in %llu iterations.\n", iterations);
 	free(cells);
-	
-	size_t size = strlen(output);
-	output_p = NULL;
-	output = realloc(output, size);
-	struct return_struct *s = malloc(sizeof(struct return_struct));
-	s->iterations = iterations;
-	s->output = output;
-	return s;
 }

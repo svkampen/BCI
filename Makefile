@@ -5,3 +5,6 @@ FILES=bf/*.c list/list.c list/stack.c
 
 all:
 	$(CC) $(CFLAGS) $(LDFLAGS) -o bci $(FILES)
+
+clean:
+	rm bf/*.o; rm list/*.o;

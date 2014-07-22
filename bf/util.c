@@ -15,3 +15,20 @@ char* get_part(char* string, int x, int y) {
     return tmp;
 }
 
+int find_loop_end(char* string) {
+	int n = 0;
+	int index = 0;
+	do {
+		if (string[index] == '[') {
+			n++;
+		} else if (string[index] == ']') {
+			n--;
+		} else if (string[index] == '?') {
+			n--;
+		}
+		index++;
+	} while (n != 0);
+
+	return index-1;
+}
+

@@ -18,6 +18,7 @@ char* preprocess(char* input) {
 
     char* processed = calloc(processed_length, sizeof(char));
     int processed_index = 0;
+    char* x;
 
     for(int input_pointer = 0; input[input_pointer] != '\0'; ++input_pointer) {
         if (isdigit(input[input_pointer])) {
@@ -70,7 +71,7 @@ char* preprocess(char* input) {
                     processed_index += sprintf(processed+processed_index, "%s", to_repeat_s);
                 }
             }
-        } else if (strcmp(get_part(input, input_pointer, input_pointer+3), "[-]") == 0) {
+        } else if (strcmp((x = get_part(input, input_pointer, input_pointer+3)), "[-]") == 0) {
             // optimize this. It's easy!
             processed[processed_index++] = NULLIFY;
             input_pointer += 2;
@@ -78,6 +79,10 @@ char* preprocess(char* input) {
             continue; //do not copy these characters.
         } else {
             processed[processed_index++] = input[input_pointer];
+        }
+        if (x != NULL) {
+            free(x);
+            x = NULL;
         }
         memset(nums, 0, 10);
         num = 0;

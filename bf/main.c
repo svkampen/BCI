@@ -40,12 +40,7 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 	char* processed = preprocess(argv[1]); 
-	struct return_struct *s;
-	s = run_tape(processed);
-	printf("%s\n", s->output);
-	free(s->output);
-	printf("\nRan in %d iterations.\n", s->iterations);
-	free(s);
-	free(processed);
+    run_tape(processed);
+    free(processed);
 	return 0;
 }
