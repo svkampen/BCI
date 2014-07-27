@@ -1,6 +1,6 @@
 #ifndef _INTERPRET_H_
 #define _INTERPRET_H_
+#include <inttypes.h>
 
-void run_tape(char* tape);
-
+char *run_tape(char* input, uint8_t quiet);
 #endif

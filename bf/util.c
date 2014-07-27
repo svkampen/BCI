@@ -1,5 +1,6 @@
 #include "util.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 int index_in(char* string, char part) {
@@ -10,7 +11,7 @@ int index_in(char* string, char part) {
 }
 
 char* get_part(char* string, int x, int y) {
-    char *tmp = calloc((1+(y-x)), sizeof(char));
+    char *tmp = calloc(1+(y-x), sizeof(char));
     strncpy(tmp, (string+x), y-x);
     return tmp;
 }
@@ -32,3 +33,15 @@ int find_loop_end(char* string) {
 	return index-1;
 }
 
+void *reallocate(void *ptr, size_t size) {
+	void *tmp = NULL;
+	tmp = realloc(ptr, size);
+	if (tmp == NULL) {
+		// Reallocate failed.
+		// Spit out an error message and quit.
+		fprintf(stderr, "Error while reallocating memory: pointer returned by realloc was NULL.\n");
+		exit(-1);
+	} else {
+    	return tmp;
+	}
+}
