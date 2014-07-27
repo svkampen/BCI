@@ -17,20 +17,20 @@ char* get_part(char* string, int x, int y) {
 }
 
 int find_loop_end(char* string) {
-	int n = 0;
-	int index = 0;
-	do {
-		if (string[index] == '[') {
-			n++;
-		} else if (string[index] == ']') {
-			n--;
-		} else if (string[index] == '?') {
-			n--;
-		}
-		index++;
-	} while (n != 0);
+    int n = 0;
+    int index = 0;
+    do {
+        if (string[index] == '[') {
+            n++;
+        } else if (string[index] == ']') {
+            n--;
+        } else if (string[index] == '?') {
+            n--;
+        }
+        index++;
+    } while (n != 0);
 
-	return index-1;
+    return index-1;
 }
 
 void *reallocate(void *ptr, size_t size) {

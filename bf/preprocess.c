@@ -49,8 +49,8 @@ char *preprocess(char *input) {
             // if we don't decrement now we will miss a character.
 
             --input_pointer;
-            if (to_repeat == '+') {
-                processed_index += sprintf(expanded+processed_index, "%s", nums);
+            if (to_repeat == '+' || to_repeat == '-' || to_repeat == '<' || to_repeat == '>') {
+                processed_index += sprintf(processed+processed_index, "%s", nums);
                 continue;
             }
 
