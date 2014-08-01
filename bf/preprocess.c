@@ -50,7 +50,7 @@ char *preprocess(char *input) {
 
             --input_pointer;
             if (to_repeat == '+' || to_repeat == '-' || to_repeat == '<' || to_repeat == '>') {
-                processed_index += sprintf(processed+processed_index, "%s", nums);
+                processed_index += sprintf(expanded+processed_index, "%s", nums);
                 continue;
             }
 
@@ -72,12 +72,11 @@ char *preprocess(char *input) {
                     expanded[processed_index++] = to_repeat;
                 }
             } else {
-                repeat_start = index_in(input, '{')+1;
+                repeat_start = input_pointer-find_bracket_begin(input+(input_pointer-1));
                 // Replace the { with \x02 so that when there is a new bracket repetition,
                 // it does not mistake the { of this brep with the beginning of the other brep.
-                input[repeat_start-1] = PREVIOUSLY_BRACKET_OPEN;
                 to_repeat_s = get_part(input, repeat_start, input_pointer-strlen(nums));
-                processed_length += strlen(to_repeat_s)*(num-1);
+                processed_length += (strlen(to_repeat_s)+1)*(num-1);
                 expanded = reallocate(expanded, processed_length);
 				memset(expanded+processed_index, 0, processed_length-processed_index);
 				for (; num != 0; --num) {
@@ -85,9 +84,14 @@ char *preprocess(char *input) {
                 }
 				free(to_repeat_s);
             }
-		} else if (input[input_pointer] == '{' || input[input_pointer] == '}') {
+		} else if (input[input_pointer] == '}' || input[input_pointer] == '{') {
 			continue;
 		} else {
+			if (processed_length <= processed_index+1) {
+				processed_length *= 2;
+				expanded = reallocate(expanded, processed_length);
+				memset(expanded+processed_index, 0, processed_length-processed_index);
+			}
 			expanded[processed_index++] = input[input_pointer];
 		}
         memset(nums, 0, 10);

@@ -40,15 +40,20 @@ char *prepro(char *input) {
 }
 
 char *interpret(char *string, uint8_t flags) {
-	char *processed = string;
+	char *processed = strdup(string);
 	char *input;
 
 	do {
 		input = processed;
 		processed = preprocess(processed);
 	} while (processed);	
-	return run_tape(input, flags);
+    char *tmp = run_tape(input, flags);
 	free(input);
+	return tmp;
+}
+
+char *interpret2(char *string, uint8_t flags) {
+	return interpret(strdup(string), flags);
 }
 
 int main(int argc, char* argv[]) {

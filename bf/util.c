@@ -33,6 +33,20 @@ int find_loop_end(char* string) {
     return index-1;
 }
 
+int find_bracket_begin(char* string) {
+	int n = 0;
+	int index = 1;
+	do {
+		index--;
+		if (string[index] == '}') {
+			n++;
+		} else if (string[index] == '{') {
+			n--;
+		}
+	} while (n != 0);
+	return abs(index);
+}
+
 void *reallocate(void *ptr, size_t size) {
 	void *tmp = NULL;
 	tmp = realloc(ptr, size);
