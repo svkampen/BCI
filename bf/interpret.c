@@ -101,6 +101,7 @@ char *run_tape(char* tape, uint8_t flags) {
 				char *nums = calloc(10, 1);
 				int num = 0;
 				int num_index = 0;
+				char op = tape[input_pointer-1];
 				// Okay, fine, the only case wherein this can happen is '+'.
 				nums[num_index++] = tape[input_pointer++];
 				// While the input_pointer points to a number,
@@ -117,7 +118,11 @@ char *run_tape(char* tape, uint8_t flags) {
 				// The subtraction is done because one of the repetitions has
 				// already been done.
 				num = atoi(nums)-1;
-				*cell_p += num;
+				if (op == '-') {
+					*cell_p -= num;
+				} else if (op == '+') {
+					*cell_p += num;
+				}
 				free(nums);
 			}
 		}
