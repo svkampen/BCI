@@ -71,7 +71,7 @@ char *run_tape(char* tape, uint8_t flags) {
 				}
 				break;
 			case '\'':
-				*cell_p = tape[input_pointer+1]; break;
+				*cell_p = tape[++input_pointer]; break;
 			case '^':
 				*cell_p = (*cell_p)*(*cell_p); break;
 			case '/':
